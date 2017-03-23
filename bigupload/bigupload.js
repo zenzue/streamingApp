@@ -20,14 +20,20 @@ $(document).ready(function () {
 				},
 			success: function(data)
 		    {
-		    	console.log(data);
-		    	// if (data.status === 'success') {
-		    	// 	waitingDialog.hide();
-		    	// 	swal("Saved", "Successfully create the new song", "success");
-		    	// } else {
-		    	// 	waitingDialog.hide();		
-		    	// 	swal("Error", "Unable to create the new song", "error");
-		    	// }
+		    	if (data.status === 'success') {
+		    		waitingDialog.hide();
+		    		// swal("Saved", "Successfully create the new song", "success");
+		    		swal({
+		    			title: 'Saved',
+		    			text: 'Successfully create the new song',
+		    			type: 'success',
+		    		}, function () {
+		    			window.location.href = "../song/song.php";
+		    		});
+		    	} else {
+		    		waitingDialog.hide();		
+		    		swal("Error", "Unable to create the new song", "error");
+		    	}
 		    },
 		  	error: function(e) 
 	    	{

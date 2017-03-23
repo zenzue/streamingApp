@@ -39,13 +39,14 @@ $columns = array(
 	            	<div id="edit-genere" class="btn btn-info edit-btn margin-right-1em">
 		 	                <span class="glyphicon glyphicon-edit"></span> Edit
 		 	        </div>
-		 	        <div id="delete-genere" class="btn btn-danger delete-btn">
-		 	        	<span class="glyphicon glyphicon-remove"></span> Delete
-		 	        </div>
 	 	        ';
         }
     )
 );
+
+// <div id="delete-genere" class="btn btn-danger delete-btn">
+//     <span class="glyphicon glyphicon-remove"></span> Delete
+// </div>
  
 // SQL server connection information
 $sql_details = array(

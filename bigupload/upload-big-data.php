@@ -76,7 +76,17 @@
 				$stmt = $db_con->prepare($sql);
 				$stmt->execute();
 				$row = $stmt->fetch(PDO::FETCH_ASSOC);
-				$albumId = $row['album_id'];
+				$num = $stmt->rowCount();
+				if ($num > 0) {
+					$albumId = $row['album_id'];
+				} else {
+					// $sql = "SELECT album_id FROM albums WHERE album_name = 'UNKNOWN'";
+					// $stmt = $db_con->prepare($sql);
+					// $stmt->execute();
+					// $row = $stmt->fetch(PDO::FETCH_ASSOC);
+					// $albumId = $row['album_id'];
+					$albumId = 23;
+				}
 
 
 				/* Get audio year tag */
@@ -90,18 +100,18 @@
 
 				/* Get audio genere tag */
 
+
 				$frame = $id3->getFramesByIdentifier('TCON');
 				if (empty($frame)) {
-					$genere = "UNKNOWN";
+					$genere_id = "1000";
 				} else {
-					$genere = $frame[0]->getText();
+					$genere_id = $frame[0]->getText();
+					$genere_id = substr($genere_id, 1);
+					$genere_id = rtrim($genere_id,")");
 				}
 
-				$query = 'SELECT * FROM genere WHERE genere = "'.$genere.'"';
-				$stmt = $db_con->prepare($query);
-				$stmt->execute();
-				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-				    $genere_id = $row['genere_id'];
+				if (!is_numeric($genere_id)) {
+					$genere_id = "1000";
 				}
 
 				/* Get audio lyric tag */
@@ -127,8 +137,14 @@
 				$query = 'SELECT * FROM publisher WHERE pub_prefix = "'.$prefix.'"';
 				$stmt = $db_con->prepare($query);
 				$stmt->execute();
-				while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-				    $pub_id = $row['pub_id'];
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
+				$num = $stmt->rowCount();
+				if ($num > 0) {
+
+					$pub_id = $row['pub_id'];
+
+				} else {
+					$pub_id = 3;
 				}
 
 				$sql = 'SELECT id FROM tbl_last_id';
@@ -171,7 +187,7 @@
 
 			exec('ffmpeg -i '.$tmp_file_path.' -acodec libmp3lame -b:a '.$bitrate.'k -ac 1 -ar 11025 '.$tmp_low_path);			
 
-			$response['status'] = $title . "was uploaded";
+			$response[] = $title . "was uploaded";
 
 			$result = $s3->putObject([
 			    'Bucket' => $config['s3']['bucket'],
@@ -191,17 +207,16 @@
 			unlink($tmp_low_path);
 
 				if ($result) {
-
+					
 				$sql = "INSERT INTO `songs`(`pub_song_id`, `album_id`, `song_name`, `song_rating`, `song_favourite`, genere_id, `song_high_path`, `song_low_path`, `lyric`, `year`, `song_role`, `publisher_id`) VALUES ('".$ID."', '".$albumId."', '".$title."', '1', '".$song_role."', '".$genere_id."', '".$song_high."', '".$song_low."', '".$lyric."', '".$year."', '".$song_role."', '".$pub_id."')";
 
-					    $stmt = $db_con->prepare($sql);
+					$stmt = $db_con->prepare($sql);
 					if ($stmt->execute()) {
 					    $resCount++;
-					    $response[]= $title . 'was uploaded';
+					    $response['status'] = 'success';
 					} else {
-					    $response[]='failed';
+					    $response['status'] = 'failed';
 					}
-
 				}
 
 			}

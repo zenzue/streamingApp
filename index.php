@@ -4,7 +4,7 @@ session_start();
 
 if(isset($_SESSION['user_session'])!="")
 {
-  header("Location: songs/song.php");
+  header("Location: song/song.php");
 }
 
 ?>

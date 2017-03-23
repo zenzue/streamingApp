@@ -20,6 +20,8 @@
         $('#playlog').DataTable( {
             "processing": true,
             "serverSide": true,
+            "bFilter" : false,
+            "bInfo":false,
             "ajax": "./playlog_data_table.php"
         } );
     } );
